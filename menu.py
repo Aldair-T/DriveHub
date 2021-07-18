@@ -1,8 +1,9 @@
 from ListadoArchivos import listar_archivos
+from CrearArchivos import creacion_archivos
 
 
 def menu() -> None:
-    print("1) Listar archivos de la carpeta actual\n"
+    print("1) Listar archivos\n"
           "2) Crear un archivo\n"
           "3) Subir un archivo\n"
           "4) Descargar un archivo\n"
@@ -28,7 +29,7 @@ def main() -> None:
         if opcion == 1:
             listar_archivos()
         if opcion == 2:
-            pass
+            creacion_archivos()
         if opcion == 3:
             pass
         if opcion == 4:
