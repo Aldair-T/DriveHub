@@ -3,7 +3,7 @@ import io
 from googleapiclient.http import MediaIoBaseDownload
 from service_drive import obtener_servicio
 
-# Es una maqueta, hay errores q no puedo resolverlo, no entiendo el metodo
+# Es una maqueta, hay errores q no puedo resolver, no entiendo el metodo
 
 '''servicio = obtener_servicio()
 file_id = ['0BwwA4oUTeiV1UVNwOHItT0xfa2M']

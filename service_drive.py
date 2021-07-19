@@ -16,7 +16,7 @@ API_NAME = 'drive'
 
 API_VERSION = 'v3'
 
-PATH_TOKEN = '../token_drive.json'
+PATH_TOKEN = 'token_drive.json'
 
 def cargar_credenciales() -> Credentials:
     credencial = None
