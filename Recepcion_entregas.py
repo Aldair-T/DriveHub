@@ -1,6 +1,8 @@
 from pathlib import Path
 from service_gmail import obtener_servicio
 import os
+from email.mime.text import MIMEText
+import base64
 
 def enviar_mensaje():
     gmail_de = "ljun@fi.uba.ar"
