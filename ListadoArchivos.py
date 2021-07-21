@@ -1,3 +1,4 @@
+from service_drive import obtener_servicio
 import os
 import pathlib
 
@@ -14,7 +15,7 @@ def listado(carpetas_anidadas: list, carpeta: str) -> None:
     carpetas_anidadas.append(carpeta)
     anidacion = '/'.join(carpetas_anidadas)
     existe = os.path.exists(anidacion)
-    if existe == False:
+    if not existe:
         print("!No existe esa carpeta¡")
         carpetas_anidadas.remove(carpeta)
     else:
@@ -30,7 +31,7 @@ def repo_local() -> None:
     for carpetas in repo_inicial.iterdir():
         print(f"- {carpetas.name}")
     carpetas_anidadas = ['/Users']
-    while seguir == True:
+    while seguir:
         carpeta = input("Ingrese una carpeta o exit para salir: ")
         if carpeta == "exit":
             seguir = False
@@ -38,10 +39,34 @@ def repo_local() -> None:
             listado(carpetas_anidadas, carpeta)
 
 
+def listar_todo_drive() -> None:
+    # Lista todos los archivos del Drive con su id correspondiente
+    acceso = True
+    while acceso:
+        response = obtener_servicio().files().list().execute()
+        for file in response.get('files', []):
+            print(f"- {file.get('name')}, su id es: {file.get('id')}")
+        if acceso:
+            acceso = False
+
+
+def repo_remoto() -> None:
+    # Elegir en como buscar sus archivos
+    print("1) Listar todos los archivos\n"
+          "2) Busqueda especifica\n")
+    respuesta = input("Ingrese una opcion: ")
+    while not respuesta.isnumeric() or int(respuesta) < 1 or int(respuesta) > 2:
+        respuesta = input("Ingrese una opcion correcta: ")
+    if int(respuesta) == 1:
+        listar_todo_drive()
+    if int(respuesta) == 2:
+        pass
+
+
 def listar_archivos() -> None:
     # Elegir si navegar entre repositorio local o remoto
     acceso = True
-    while acceso == True:
+    while acceso:
         opciones()
         opcion = input("Elija una opcion: ")
         while not opcion.isnumeric() or int(opcion) < 1 or int(opcion) > 3:
@@ -49,6 +74,6 @@ def listar_archivos() -> None:
         if int(opcion) == 1:
             repo_local()
         elif int(opcion) == 2:
-            print("Falta crear la funcion de repo_remoto")
+            repo_remoto()
         elif int(opcion) == 3:  # Hay un error aca, no vuelve al menu principal
             acceso = False
