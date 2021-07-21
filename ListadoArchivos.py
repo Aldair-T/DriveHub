@@ -1,6 +1,7 @@
 from service_drive import obtener_servicio
 import os
 import pathlib
+import pandas as pd
 
 
 def opciones() -> None:
@@ -10,7 +11,7 @@ def opciones() -> None:
           "3) Salir")
 
 
-def listado(carpetas_anidadas: list, carpeta: str) -> None:
+def listado_repo_local(carpetas_anidadas: list, carpeta: str) -> None:
     # Lista los archivos del parámetro pasado
     carpetas_anidadas.append(carpeta)
     anidacion = '/'.join(carpetas_anidadas)
@@ -36,7 +37,7 @@ def repo_local() -> None:
         if carpeta == "exit":
             seguir = False
         else:
-            listado(carpetas_anidadas, carpeta)
+            listado_repo_local(carpetas_anidadas, carpeta)
 
 
 def listar_todo_drive() -> None:
@@ -50,6 +51,21 @@ def listar_todo_drive() -> None:
             acceso = False
 
 
+def busqueda_especifica() -> None:
+    Id = input("Ingrese el archivo a buscar: ")
+    response = obtener_servicio().files().list().execute()
+    archivos_exactos = response.get(Id)
+    siguiente_pagina = response.get('nextPageToken')
+
+    while siguiente_pagina:
+        response = obtener_servicio().files().list().execute()
+        archivos_exactos.extend(response.get(Id))
+        siguiente_pagina = response.get('nextPageToken')
+
+    archivos = pd.DataFrame(archivos_exactos)
+    print(archivos)
+
+
 def repo_remoto() -> None:
     # Elegir en como buscar sus archivos
     print("1) Listar todos los archivos\n"
@@ -60,7 +76,7 @@ def repo_remoto() -> None:
     if int(respuesta) == 1:
         listar_todo_drive()
     if int(respuesta) == 2:
-        pass
+        busqueda_especifica()
 
 
 def listar_archivos() -> None:
@@ -74,6 +90,6 @@ def listar_archivos() -> None:
         if int(opcion) == 1:
             repo_local()
         elif int(opcion) == 2:
-            repo_remoto()
+            listar_todo_drive()
         elif int(opcion) == 3:  # Hay un error aca, no vuelve al menu principal
             acceso = False

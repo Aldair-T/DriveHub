@@ -1,5 +1,7 @@
 from ListadoArchivos import listar_archivos
 from CrearArchivos import creacion_archivos
+from DescargarArchivos import descargar_archivos
+from SubirArchivo import subir_archivos
 
 
 def menu() -> None:
@@ -31,9 +33,9 @@ def main() -> None:
         if opcion == 2:
             creacion_archivos()
         if opcion == 3:
-            pass
+            subir_archivos()
         if opcion == 4:
-            pass
+            descargar_archivos()
         if opcion == 5:
             pass
         if opcion == 6:
