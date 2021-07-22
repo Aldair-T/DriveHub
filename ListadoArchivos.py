@@ -42,13 +42,9 @@ def repo_local() -> None:
 
 def listar_todo_drive() -> None:
     # Lista todos los archivos del Drive con su id correspondiente
-    acceso = True
-    while acceso:
-        response = obtener_servicio().files().list().execute()
-        for file in response.get('files', []):
-            print(f"- {file.get('name')}, su id es: {file.get('id')}")
-        if acceso:
-            acceso = False
+    response = obtener_servicio().files().list().execute()
+    for file in response.get('files', []):
+        print(f"- {file.get('name')}, su id es: {file.get('id')}")
 
 
 def busqueda_especifica() -> None:
