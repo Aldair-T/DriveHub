@@ -4,16 +4,15 @@ from service_gmail import obtener_servicio as SERVICE_GMAIL
 carpeta_TP2_ID = "1356xXW9laVirDDJv1dEKgkAnw5zT1Rc3"
 
 def carpetas_encontradas():
-    carpetas_examenes_encontradas = list()
-    arpetas_alumnos_encontradas = list()
-    arpetas_profesores_encontradas = list()
+
+    carpetas_en_drive = list()
 
     carpetas = SERVICE_DRIVE().files().list(q = f"mimeType = 'application/vnd.google-apps.folder' and parents in '{carpeta_TP2_ID}'").execute()
 
-    print(carpetas)
-
     for carpeta in carpetas['files']:
-        print(carpeta['name'])
+        carpetas_en_drive.append(carpeta['name'])
+    
+    leer_mail(carpetas_en_drive)
     
     
 
@@ -49,7 +48,7 @@ def creacion_carpeta(nombre):
 
 
 
-def leer_mail():
+def leer_mail(carpetas_en_drive):
 
     resultados = SERVICE_GMAIL().users().messages().list(userId='me').execute()
 
@@ -69,14 +68,14 @@ def leer_mail():
             if value['name'] == 'Subject':
                 asunto = (value['value']).split()
                 if asunto[0] == "nombre_examen":
-                    nombre_examen = asunto[1]
-                    creacion_carpeta(nombre_examen)
+                    if asunto[1] not in carpetas_en_drive:
+                        nombre_examen = asunto[1]
+                        creacion_carpeta(nombre_examen)
 
 
 
 carpetas_encontradas()
 
-leer_mail()
 
 
 
