@@ -1,6 +1,6 @@
 from ListadoArchivos import listar_archivos
 from CrearArchivos import creacion_archivos
-from DescargarArchivos import descargar_archivos
+from DescargarArchivos import crear_carpeta_descargas
 from SubirArchivo import subir_archivos
 
 
@@ -35,7 +35,7 @@ def main() -> None:
         if opcion == 3:
             subir_archivos()
         if opcion == 4:
-            descargar_archivos()
+            crear_carpeta_descargas()
         if opcion == 5:
             pass
         if opcion == 6:
