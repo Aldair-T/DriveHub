@@ -8,12 +8,12 @@ def descargar_archivos(ids_archivo: list, nombre_archivos: list) -> None:
     for id_archivo, nombre_archivo in zip(ids_archivo, nombre_archivos):
         respuesta = obtener_servicio().files().get_media(fileId = id_archivo)
         fh = io.BytesIO()
-        downloader = MediaIoBaseDownload(fd = fh, request = respuesta)
-        done = False
-        while done is False:
-            status, done = downloader.next_chunk()
-            print("Download %d%%." % int(status.progress() * 100))
-            done = True
+        descarga = MediaIoBaseDownload(fd = fh, request = respuesta)
+        salir = False
+        while salir is False:
+            estado, salir = descarga.next_chunk()
+            print("Download %d%%." % int(estado.progress() * 100))
+            salir = True
         fh.seek(0)
         with open(os.path.join("./Descargas_Drive", nombre_archivo), "wb") as archivos:
             archivos.write(fh.read())
