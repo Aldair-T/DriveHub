@@ -1,5 +1,5 @@
 from pathlib import Path
-from service_gmail import obtener_servicio
+from service_gmail import obtener_servicio as SERVICE_GMAIL
 import os
 from email.mime.text import MIMEText
 import base64
@@ -20,13 +20,12 @@ def enviar_mensaje():
     body= {'raw': raw}
 
     try:
-        message = (service.users().messages().send(userId=user_id, body=message)
-                .execute())
+        message = (SERVICE_GMAIL.users().messages().send(userId='me', body=body).execute())
         print ("Mensaje enviado")
     except errors.MessageError as error:
         print ('An error occurred: %s' % error)
 
 def main():
     enviar_mensaje()
-  
+
 main()
