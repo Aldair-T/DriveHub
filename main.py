@@ -2,7 +2,7 @@ from ListadoArchivos import listar_archivos
 from CrearArchivos import creacion_archivos
 from DescargarArchivos import crear_carpeta_descargas
 from SubirArchivo import subir_archivos
-from SincronizarArchivos import timepo
+from SincronizarArchivos import sincronizacion
 
 def menu() -> None:
     print("1) Listar archivos\n"
@@ -37,7 +37,7 @@ def main() -> None:
         if opcion == 4:
             crear_carpeta_descargas()
         if opcion == 5:
-            timepo()
+            sincronizacion()
         if opcion == 6:
             pass
         if opcion == 7:
