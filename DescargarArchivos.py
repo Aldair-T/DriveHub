@@ -25,7 +25,7 @@ def elegir_extencion(archivo_elegido: str) -> list:
     elif int(archivo_elegido) == 4:
         return ['text/csv', '.csv']
     elif int(archivo_elegido) == 5:
-        return ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx']
+        return ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', '.docx']
     elif int(archivo_elegido) == 6:
         return ['image/jpeg', '.jpg']
     elif int(archivo_elegido) == 7:
