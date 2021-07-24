@@ -99,8 +99,6 @@ def carpetas_encontradas() -> None:
     leer_mail(carpetas_en_drive)
 
 
-carpetas_encontradas()
-
 
 
 
