@@ -39,12 +39,33 @@ def repo_local() -> None:
             listado_repo_local(carpetas_anidadas, carpeta)
 
 
+def listar_carpetas_remoto() -> None:
+    id_carpeta = input("Ingrese el id de su carpeta: ")
+    query = f"parents = '{id_carpeta}'"
+    respuesta = obtener_servicio().files().list(q = query).execute()
+    print(respuesta)
+    nextPageToken = respuesta.get('nextPageToken')
+    while nextPageToken:
+        respuesta = obtener_servicio().files().list(q = query, pageToken = nextPageToken).execute()
+        nextPageToken = respuesta.get('nextPageToken')
+    for archivos in respuesta.get('files', []):
+        print(f"- {archivos.get('name')} su id es: {archivos.get('id')}")
+
+
 def repo_remoto() -> None:
+    acceso = True
     # Lista todos los archivos del Drive con su id correspondiente
     response = obtener_servicio().files().list().execute()
     for file in response.get('files', []):
-        print(f"- {file.get('name')}, su id es: {file.get('id')}")
-
+        print(f"- {file.get('name')} su id es: {file.get('id')}")
+    while acceso:
+        seguir = input("Queres buscar alguna carpeta? s/n: ")
+        if seguir == "s":
+            listar_carpetas_remoto()
+        elif seguir == "n":
+            acceso = False
+        else:
+            seguir = input("Ingrese una repsuesta corercta (s/n): ")
 
 
 def listar_archivos() -> None:
