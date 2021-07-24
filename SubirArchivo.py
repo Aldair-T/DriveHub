@@ -1,7 +1,7 @@
 import os
 from service_drive import obtener_servicio
 from googleapiclient.http import MediaFileUpload
-
+from ListadoArchivos import repo_local
 
 def tipos_archivos() -> None:
     print("1)Pdf\n"
@@ -24,7 +24,7 @@ def elegir_extencion(archivo_elegido: str) -> list:
     elif int(archivo_elegido) == 4:
         return ['text/csv', '.csv']
     elif int(archivo_elegido) == 5:
-        return ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx']
+        return ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', '.docx']
     elif int(archivo_elegido) == 6:
         return ['image/jpeg', '.jpg']
     elif int(archivo_elegido) == 7:
@@ -43,14 +43,14 @@ def subiendo_archivo(archivo: str) -> None:
 
 
 def subir_archivos() -> None:
-    nombre_archivo = input("Ingrese el nombre del archivo: ")
+    nombre = repo_local()
     tipos_archivos()
     tipo_a = input("Ingrese el tipo de archivo: ")
     while not tipo_a.isnumeric() or int(tipo_a) < 1 or int(tipo_a) > 10:
         tipo_a = input("Ingrese una opcion correcta: ")
     tipo_a = elegir_extencion(tipo_a)
-    nombre_archivo += tipo_a[1]
-    if os.path.exists(nombre_archivo[1]):
-        subiendo_archivo(nombre_archivo[1])
+    if os.path.isfile(nombre):
+        print(nombre)
+        #subiendo_archivo(nombre_archivo[1])
     else:
         print("Ese archivo no existe")
