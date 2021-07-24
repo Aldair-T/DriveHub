@@ -10,7 +10,7 @@ def opciones() -> None:
           "3) Salir")
 
 
-def listado_repo_local(carpetas_anidadas: list, carpeta: str) -> None:
+def listado_repo_local(carpetas_anidadas: list, carpeta: str) -> str:
     # Lista los archivos del parámetro pasado
     carpetas_anidadas.append(carpeta)
     anidacion = '/'.join(carpetas_anidadas)
@@ -20,11 +20,16 @@ def listado_repo_local(carpetas_anidadas: list, carpeta: str) -> None:
         carpetas_anidadas.remove(carpeta)
     else:
         carpetas = pathlib.Path(anidacion)
-        for archivo in carpetas.iterdir():
-            print(f"- {archivo.name}")
+        if os.path.isfile(anidacion):
+            print("Esto es un archivo")
+            return anidacion
+        else:
+            for archivo in carpetas.iterdir():
+                print(f"- {archivo.name}")
+            return anidacion
 
 
-def repo_local() -> None:
+def repo_local() -> str:
     # Es el menu del repo local, para luego listarlo en otra funcion
     seguir = True
     repo_inicial = pathlib.Path('/Users')
@@ -32,11 +37,13 @@ def repo_local() -> None:
         print(f"- {carpetas.name}")
     carpetas_anidadas = ['/Users']
     while seguir:
-        carpeta = input("Ingrese una carpeta o exit para salir: ")
-        if carpeta == "exit":
-            seguir = False
+        carpeta = input("Ingrese una carpeta o un archivo: ")
+        respuesta = listado_repo_local(carpetas_anidadas, carpeta)
+        if os.path.isdir(respuesta):
+            seguir = True
         else:
-            listado_repo_local(carpetas_anidadas, carpeta)
+            return respuesta
+
 
 
 def listar_carpetas_remoto() -> None:
