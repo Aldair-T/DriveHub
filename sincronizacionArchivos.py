@@ -88,15 +88,14 @@ def convertir_fecha_modific(fecha_modificacion: str) -> list:
         fecha_convertida.append(fecha_modificacion[contador: contador + formato])
         contador += formato
 
-#    2020,07,28,16,36,56
-#    2020728163656
+    return fecha_convertida
 
 def comparar_fechas_modific(fecha_modificacion_1,fecha_modificacion_2):
     es_mayor = False
 
     for i in range(len(fecha_modificacion_1)):
 
-        if fecha_modificacion_1[i] > fecha_modificacion_2:
+        if int(fecha_modificacion_1[i]) > int(fecha_modificacion_2):
             es_mayor = True
     
     return es_mayor
