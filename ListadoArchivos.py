@@ -18,6 +18,7 @@ def listado_repo_local(carpetas_anidadas: list, carpeta: str) -> str:
     if not existe:
         print("!No existe esa carpeta¡")
         carpetas_anidadas.remove(carpeta)
+        return 'No existe'
     else:
         carpetas = pathlib.Path(anidacion)
         if os.path.isfile(anidacion):
@@ -41,22 +42,37 @@ def repo_local() -> str:
         respuesta = listado_repo_local(carpetas_anidadas, carpeta)
         if os.path.isdir(respuesta):
             seguir = True
-        else:
+        elif os.path.isfile(respuesta):
             return respuesta
+        else:
+            seguir = False
 
 
-
-def listar_carpetas_remoto() -> None:
-    id_carpeta = input("Ingrese el id de su carpeta: ")
-    query = f"parents = '{id_carpeta}'"
-    respuesta = obtener_servicio().files().list(q = query).execute()
-    print(respuesta)
-    nextPageToken = respuesta.get('nextPageToken')
-    while nextPageToken:
-        respuesta = obtener_servicio().files().list(q = query, pageToken = nextPageToken).execute()
+def listar_carpeta_drive(ids_carpetas: list) -> None:
+    id_ = input("Ingrese el id de su carpeta: ")
+    if id_ in ids_carpetas:
+        query = f"parents = '{id_}'"
+        respuesta = obtener_servicio().files().list(q = query).execute()
         nextPageToken = respuesta.get('nextPageToken')
-    for archivos in respuesta.get('files', []):
-        print(f"- {archivos.get('name')} su id es: {archivos.get('id')}")
+        while nextPageToken:
+            respuesta = obtener_servicio().files().list(q = query, pageToken = nextPageToken).execute()
+            nextPageToken = respuesta.get('nextPageToken')
+        for archivos in respuesta.get('files', []):
+            print(f"- {archivos.get('name')} su id es: {archivos.get('id')}")
+    else:
+        print("No existe esa carpeta")
+
+
+def verificar_carpetas() -> None:
+    id_carpetas = []
+    response = obtener_servicio().files().list(q = "mimeType = 'application/vnd.google-apps.folder'").execute()
+    for file in response.get('files', []):
+        ids = file.get('id')
+        id_carpetas.append(ids)
+    if len(id_carpetas) > 0:
+        listar_carpeta_drive(id_carpetas)
+    else:
+        print("No hay carpetas en tu drive")
 
 
 def repo_remoto() -> None:
@@ -68,11 +84,11 @@ def repo_remoto() -> None:
     while acceso:
         seguir = input("Queres buscar alguna carpeta? s/n: ")
         if seguir == "s":
-            listar_carpetas_remoto()
+            verificar_carpetas()
         elif seguir == "n":
             acceso = False
         else:
-            seguir = input("Ingrese una repsuesta corercta (s/n): ")
+            print("Ingrese una respuesta correcta")
 
 
 def listar_archivos() -> None:
