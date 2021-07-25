@@ -1,9 +1,8 @@
 from ListadoArchivos import listar_archivos
 from CrearArchivos import creacion_archivos
-from DescargarArchivos import crear_carpeta_descargas
+from DescargarArchivos import ingresar_carpeta_descarga
 from SubirArchivo import subir_archivos
 from SincronizarArchivos import sincronizacion
-from nose import enviar
 
 def menu() -> None:
     print("1) Listar archivos\n"
@@ -36,7 +35,7 @@ def main() -> None:
         if opcion == 3:
             subir_archivos()
         if opcion == 4:
-            crear_carpeta_descargas()
+            ingresar_carpeta_descarga()
         if opcion == 5:
             sincronizacion()
         if opcion == 6:
