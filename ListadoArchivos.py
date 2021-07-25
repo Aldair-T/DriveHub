@@ -63,7 +63,7 @@ def listar_carpeta_drive(ids_carpetas: list) -> None:
         print("No existe esa carpeta")
 
 
-def verificar_carpetas() -> None:
+def verificar_carpetas_drive() -> None:
     id_carpetas = []
     response = obtener_servicio().files().list(q = "mimeType = 'application/vnd.google-apps.folder'").execute()
     for file in response.get('files', []):
@@ -84,7 +84,7 @@ def repo_remoto() -> None:
     while acceso:
         seguir = input("Queres buscar alguna carpeta? s/n: ")
         if seguir == "s":
-            verificar_carpetas()
+            verificar_carpetas_drive()
         elif seguir == "n":
             acceso = False
         else:
