@@ -3,7 +3,7 @@ from CrearArchivos import creacion_archivos
 from DescargarArchivos import crear_carpeta_descargas
 from SubirArchivo import subir_archivos
 from SincronizarArchivos import sincronizacion
-from nose import enviar
+from RecepcionEntregas import enviar_mensaje
 
 def menu() -> None:
     print("1) Listar archivos\n"
@@ -42,7 +42,7 @@ def main() -> None:
         if opcion == 6:
             pass
         if opcion == 7:
-            enviar()
+            enviar_mensaje()
         if opcion == 8:
             acceso = False
 
