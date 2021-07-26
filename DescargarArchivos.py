@@ -45,7 +45,7 @@ def descargar_archivos_media(ids_archivos: str, nombre_archivo: str, anidacion: 
         status, salir = descarga.next_chunk()
         print("Se descargo su archivo con exito")
     fh.seek(0)
-    with open(os.path.join(anidacion, nombre_archivo), 'wb') as f:
+    with open(os.path.join(anidacion, nombre_archivo), 'wb', encoding = "utf-8") as f:
         f.write(fh.read())
         f.close()
 
@@ -54,7 +54,7 @@ def descargar_archivos_workspace(ids_archivo: str, tipo_archivo: str, nombre_arc
     byteData = obtener_servicio().files().export_media(
         fileId = ids_archivo,
         mimeType = tipo_archivo).execute()
-    with open(os.path.join(anidacion, nombre_archivo), 'wb') as f:
+    with open(os.path.join(anidacion, nombre_archivo), 'wb', encoding = "utf-8") as f:
         f.write(byteData)
         f.close()
 
@@ -64,7 +64,7 @@ def crear_nombre_archivo(anidacion: str) -> None:
     nombre_archivo = input("Ingrese el nuevo nombre: ")
     tipos_archivos()
     tipo_a = input("Ingres el tipo de archivo: ")
-    while not tipo_a.isnumeric() or int(tipo_a) < 1 or int(tipo_a) > 10:
+    while not tipo_a.isnumeric() or int(tipo_a) < 1 or int(tipo_a) > 8:
         tipo_a = input("Ingrese una opcion correcta: ")
     tipo_extension = elegir_extencion(tipo_a)
     nombre_archivo += tipo_extension[1]

@@ -52,7 +52,7 @@ def crear_archivo_txt() -> None:
         print("Ese nombre de archivo ya existe")
     else:
         crear_archivo_txt_drive(nombre_archivo)
-        nuevo_archivo = open(nombre_archivo, "w")
+        nuevo_archivo = open(nombre_archivo, "w", encoding = "utf-8")
         nuevo_archivo.close()
 
 
@@ -74,7 +74,7 @@ def crear_archivo_csv() -> None:
         print("Ese nombre de archivo ya existe")
     else:
         crear_archivo_csv_drive(nombre_archivo)
-        nuevo_archivo = open(nombre_archivo, "w")
+        nuevo_archivo = open(nombre_archivo, "w", encoding = "utf-8")
         nuevo_archivo.close()
 
 

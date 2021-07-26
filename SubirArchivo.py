@@ -2,36 +2,7 @@ import os
 from service_drive import obtener_servicio
 from googleapiclient.http import MediaFileUpload
 from ListadoArchivos import repo_local
-
-
-def tipos_archivos() -> None:
-    print("1)Pdf\n"
-          "2)Comprimido\n"
-          "3)Text\n"
-          "4)Csv\n"
-          "5)Word\n"
-          "6)Imagen\n"
-          "7)PowerPoint\n"
-          "8)Excel\n")
-
-
-def elegir_extencion(archivo_elegido: str) -> str:
-    if int(archivo_elegido) == 1:
-        return 'application/pdf'
-    elif int(archivo_elegido) == 2:
-        return 'application/zip'
-    elif int(archivo_elegido) == 3:
-        return 'text/plain'
-    elif int(archivo_elegido) == 4:
-        return 'text/csv'
-    elif int(archivo_elegido) == 5:
-        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    elif int(archivo_elegido) == 6:
-        return 'image/jpeg'
-    elif int(archivo_elegido) == 7:
-        return 'application/vnd.openxmlforma ts-officedocument.presentationml.presentation'
-    elif int(archivo_elegido) == 8:
-        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+from DescargarArchivos import tipos_archivos, elegir_extencion
 
 
 def subir_a_unidad(nombre: str, ruta_archivo: str, tipo_archivo: str) -> None:
@@ -65,11 +36,11 @@ def verificar_carpetas_drive(nombre: str, id_carpet: str, ruta_archivo: str, tip
 
 
 def elegir_datos(ruta_archivo: str, tipo_archivo: str) -> None:
-    nombre = input("Ingrese el nombre del nuevo archivo: ")
+    nombre = input("Ingrese el nombre para el nuevo archivo: ")
     respuesta = input("Deseas guardar en una carpeta especifica? s/n: ")
     if respuesta == "s":
         carpeta = input("Ingrese el id de su carpeta: ")
-        subir_a_carpeta_especifica(nombre, carpeta, ruta_archivo, tipo_archivo)
+        verificar_carpetas_drive(nombre, carpeta, ruta_archivo, tipo_archivo)
     elif respuesta == "n":
         subir_a_unidad(nombre, ruta_archivo, tipo_archivo)
     else:
@@ -81,10 +52,10 @@ def subir_archivos() -> None:
     ruta_archivo = repo_local()
     tipos_archivos()
     tipo_archivo = input("Ingrese el tipo de archivo: ")
-    while not tipo_archivo.isnumeric() or int(tipo_archivo) < 1 or int(tipo_archivo) > 10:
+    while not tipo_archivo.isnumeric() or int(tipo_archivo) < 1 or int(tipo_archivo) > 8:
         tipo_archivo = input("Ingrese una opcion correcta: ")
     tipo_archivo = elegir_extencion(tipo_archivo)
     if os.path.isfile(ruta_archivo):
-        elegir_datos(ruta_archivo, tipo_archivo)
+        elegir_datos(ruta_archivo, tipo_archivo[0])
     else:
         print("Ese archivo no existe")
