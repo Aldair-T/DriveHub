@@ -1,7 +1,6 @@
 import os
 import io
 import pathlib
-from importlib.abc import Finder
 
 from googleapiclient.http import MediaIoBaseDownload
 from service_drive import obtener_servicio
