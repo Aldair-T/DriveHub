@@ -77,6 +77,7 @@ def elegir_datos(ruta_archivo: str, tipo_archivo: str) -> None:
 
 
 def subir_archivos() -> None:
+    print("Ingrese la ruta de su archivo")
     ruta_archivo = repo_local()
     tipos_archivos()
     tipo_archivo = input("Ingrese el tipo de archivo: ")
