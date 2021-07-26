@@ -22,8 +22,3 @@ def enviar_mensaje():
         print ("Mensaje enviado")
     except errors.MessageError as error:
         print ('An error occurred: %s' % error)
-
-def main():
-    enviar_mensaje()
-
-main()

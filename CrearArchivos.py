@@ -7,7 +7,12 @@ def tipos_archivos() -> None:
     # Tipos de archivos que se pueden crear (Pueden faltar algunos)
     print("1) Crear una carpeta\n"
           "2) Crear un archivo .txt\n"
-          "3) Crear un archivo .csv\n")
+          "3) Crear un archivo .csv\n"
+          "4) Crear un archivo .jpg\n"
+          "5) Crear un archivo .pdf\n"
+          "6) Crear un archivo Word\n"
+          "7) Crear un archivo Excel\n"
+          "8) Crear un archivo PowerPoint\n")
 
 
 def crear_carpeta_drive(nombre_carpeta: str):
