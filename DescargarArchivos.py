@@ -1,10 +1,8 @@
+from googleapiclient.http import MediaIoBaseDownload
+from service_drive import obtener_servicio
 import os
 import io
 import pathlib
-
-from googleapiclient.http import MediaIoBaseDownload
-from service_drive import obtener_servicio
-
 
 def tipos_archivos() -> None:
     print("1)Pdf\n"
@@ -18,22 +16,33 @@ def tipos_archivos() -> None:
 
 
 def elegir_extension(archivo_elegido: str) -> list:
+    mimeType = ''
+    extension = ''
     if int(archivo_elegido) == 1:
-        return ['application/pdf', '.pdf']
+        mimeType = 'application/pdf'
+        extension = '.pdf'
     elif int(archivo_elegido) == 2:
-        return ['application/zip', '.zip']
+        mimeType = 'application/zip'
+        extension = '.zip'
     elif int(archivo_elegido) == 3:
-        return ['text/plain', '.txt']
+        mimeType = 'text/plain'
+        extension = '.txt'
     elif int(archivo_elegido) == 4:
-        return ['text/csv', '.csv']
+        mimeType = 'text/csv'
+        extension = '.csv'
     elif int(archivo_elegido) == 5:
-        return ['image/jpeg', '.jpg']
+        mimeType = 'image/jpeg'
+        extension = '.jpg'
     elif int(archivo_elegido) == 6:
-        return ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', '.docx']
+        mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        extension = '.docx'
     elif int(archivo_elegido) == 7:
-        return ['application/vnd.openxmlformats-officedocument.presentationml.presentation', '.pptx']
+        mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+        extension = '.pptx'
     elif int(archivo_elegido) == 8:
-        return ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.xlsx']
+        mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        extension = '.xlsx'
+    return [mimeType, extension]
 
 
 def descargar_archivos_media(ids_archivos: str, nombre_archivo: str, anidacion: str) -> None:
@@ -59,8 +68,7 @@ def descargar_archivos_workspace(ids_archivo: str, tipo_archivo: str, nombre_arc
         f.close()
 
 
-def crear_nombre_archivo(anidacion: str) -> None:
-    ids_archivo = input("Ingrese el id de su archivo: ")
+def crear_nombre_archivo(id_archivo: str, anidacion: str) -> None:
     nombre_archivo = input("Ingrese el nuevo nombre: ")
     tipos_archivos()
     tipo_a = input("Ingres el tipo de archivo: ")
@@ -69,9 +77,22 @@ def crear_nombre_archivo(anidacion: str) -> None:
     tipo_extension = elegir_extension(tipo_a)
     nombre_archivo += tipo_extension[1]
     if 1 <= int(tipo_a) <= 5:
-        descargar_archivos_media(ids_archivo, nombre_archivo, anidacion)
-    elif int(tipo_a) >=6:
-        descargar_archivos_workspace(ids_archivo, tipo_extension[0], nombre_archivo, anidacion)
+        descargar_archivos_media(id_archivo, nombre_archivo, anidacion)
+    elif int(tipo_a) >= 6:
+        descargar_archivos_workspace(id_archivo, tipo_extension[0], nombre_archivo, anidacion)
+
+
+def verificar_id(anidacion: str) -> None:
+    lista_id = []
+    id_archivo = input("Ingrese el id de su archivo: ")
+    response = obtener_servicio().files().list(q = "mimeType = 'application/vnd.google-apps.file'").execute()
+    for file in response.get('files', []):
+        ids = file.get('id')
+        lista_id.append(ids)
+    if id_archivo in lista_id:
+        crear_nombre_archivo(id_archivo, anidacion)
+    else:
+        print("No existe ese archivo en tu drive")
 
 
 def listado_repo_local(carpetas_anidadas: list, carpeta: str) -> list:
@@ -82,7 +103,7 @@ def listado_repo_local(carpetas_anidadas: list, carpeta: str) -> list:
     if not existe:
         print("!No existe esa carpeta¡")
         carpetas_anidadas.remove(carpeta)
-        return [carpetas_anidadas]
+        return carpetas_anidadas
     else:
         carpetas = pathlib.Path(anidacion)
         if os.path.isfile(anidacion):
@@ -104,7 +125,7 @@ def ingresar_carpeta_descarga() -> None:
         carpeta = input("Ingrese una carpeta o un NO para descargar aca: ")
         if carpeta == "NO":
             anidacion = '/'.join(carpetas_anidadas)
-            crear_nombre_archivo(anidacion)
+            verificar_id(anidacion)
             seguir = False
         else:
             carpetas_anidadas = listado_repo_local(carpetas_anidadas, carpeta)

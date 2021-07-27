@@ -53,10 +53,6 @@ def listar_carpeta_drive(ids_carpetas: list) -> None:
     if id_ in ids_carpetas:
         query = f"parents = '{id_}'"
         respuesta = obtener_servicio().files().list(q = query).execute()
-        nextPageToken = respuesta.get('nextPageToken')
-        while nextPageToken:
-            respuesta = obtener_servicio().files().list(q = query, pageToken = nextPageToken).execute()
-            nextPageToken = respuesta.get('nextPageToken')
         for archivos in respuesta.get('files', []):
             print(f"- {archivos.get('name')} su id es: {archivos.get('id')}")
     else:
@@ -103,5 +99,5 @@ def listar_archivos() -> None:
             repo_local()
         elif int(opcion) == 2:
             repo_remoto()
-        elif int(opcion) == 3:  # Hay un error aca, no vuelve al menu principal
+        else:  # Hay un error aca, no vuelve al menu principal
             acceso = False
