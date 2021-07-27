@@ -26,13 +26,14 @@ def leer_asunto(alumnos: list, padrones: list, mail_alumnos: list, profesores: d
         for valor in mail['payload']['headers']:
             if valor['name'] == 'Subject':
                 asunto = (valor['value']).split()
-                for i in alumnos:
+                for i in range (len (alumnos)):
                     if asunto[1] == padrones[i] and asunto[2]== "-" and asunto[4]== alumnos[i]:
                         return ("La entrega fue exitosa")
                     elif asunto[1] != padrones[i] and asunto[2]== "-" or asunto[4]!= alumnos[i]:
                         return ("nombre no coincide con padron")
                     elif asunto[1] not in padrones:
                         return ("padron incorrecto")
+
 
 def create_credencial() -> Credentials:
     if os.path.exists('token.json'):
@@ -58,10 +59,7 @@ def correctores(docente_alumno: dict)-> None:
     with open("docente-alumno.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
-            if linea[0] in docente_alumno:
-                docente_alumno[linea[0]]+=(", "+ linea[1])
-            else :
-                docente_alumno[linea[0]]=linea[1]
+            docente_alumno[linea[1]]=linea[0]
 
 def enviar_mensaje()-> None:
     alumnos = []
@@ -75,14 +73,13 @@ def enviar_mensaje()-> None:
     credencial = create_credencial()
     serv= build('gmail', 'v1', credentials=credencial)
     
-    for i in alumnos:
-        for n in docente_alumno:
-            if alumnos[i] in docente_alumno[n]:
-                gmail_de = profesores[n]
+    for i in range(len(alumnos)):
+        if alumnos[i] in docente_alumno:
+            gmail_de = profesores[docente_alumno[alumnos[i]]]
         gmail_para = mail_alumnos[i]
         mensaje = leer_asunto(alumnos, padrones, mail_alumnos, profesores, docente_alumno)
     
-    asunto ="La entrega fue..."
+    asunto ="Entrega"
 
     message = MIMEText(mensaje)
     message['to'] = gmail_para
