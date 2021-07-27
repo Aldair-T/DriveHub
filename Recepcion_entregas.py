@@ -11,10 +11,10 @@ SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send'
 ]
-def leer_asunto() -> None:
+def leer_asunto(alumnos: list, padrones: list, mail_alumnos: list, profesores: dict, docente_alumno: dict) -> None:
     credencial = create_credencial()
     serv= build('gmail', 'v1', credentials=credencial)
-    resultados = serv.users().messages().list(userId='me').execute()
+    resultados = serv.users().messages().list(userId='me', q="is:unread").execute()
     id_mails = []
     contador = 0
     for mail in resultados['messages']:
@@ -26,7 +26,13 @@ def leer_asunto() -> None:
         for valor in mail['payload']['headers']:
             if valor['name'] == 'Subject':
                 asunto = (valor['value']).split()
-                return asunto
+                for i in alumnos:
+                    if asunto[1] == padrones[i] and asunto[2]== "-" and asunto[4]== alumnos[i]:
+                        return ("La entrega fue exitosa")
+                    elif asunto[1] != padrones[i] and asunto[2]== "-" or asunto[4]!= alumnos[i]:
+                        return ("nombre no coincide con padron")
+                    elif asunto[1] not in padrones:
+                        return ("padron incorrecto")
 
 def create_credencial() -> Credentials:
     if os.path.exists('token.json'):
@@ -57,7 +63,15 @@ def correctores(docente_alumno: dict)-> None:
             else :
                 docente_alumno[linea[0]]=linea[1]
 
-def enviar_mensaje(alumnos: list, padrones: list, mail_alumnos: list, profesores: dict, docente_alumno: dict)-> None:
+def enviar_mensaje()-> None:
+    alumnos = []
+    padrones=[]
+    mail_alumnos=[]
+    profesores={}
+    docente_alumno={}
+    lista_alumnos(alumnos, padrones, mail_alumnos)
+    mail_docentes(profesores)
+    correctores(docente_alumno)
     credencial = create_credencial()
     serv= build('gmail', 'v1', credentials=credencial)
     
@@ -66,10 +80,7 @@ def enviar_mensaje(alumnos: list, padrones: list, mail_alumnos: list, profesores
             if alumnos[i] in docente_alumno[n]:
                 gmail_de = profesores[n]
         gmail_para = mail_alumnos[i]
-        if leer_asunto()[1] == padrones[i]:
-            mensaje ="La entrega fue exitosa"
-        elif leer_asunto() not in padrones:
-            mensaje ="padron incorrecto"
+        mensaje = leer_asunto(alumnos, padrones, mail_alumnos, profesores, docente_alumno)
     
     asunto ="La entrega fue..."
 
@@ -87,16 +98,7 @@ def enviar_mensaje(alumnos: list, padrones: list, mail_alumnos: list, profesores
         print ('An error occurred: %s' % error)
 
 
-
 def main()-> None:
-    alumnos = []
-    padrones=[]
-    mail_alumnos=[]
-    profesores={}
-    docente_alumno={}
-    lista_alumnos(alumnos, padrones, mail_alumnos)
-    mail_docentes(profesores)
-    correctores(docente_alumno)
-    print (leer_asunto())
+    enviar_mensaje()
 
 main()
