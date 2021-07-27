@@ -28,13 +28,13 @@ def leer_asunto() -> None:
                 asunto = (valor['value']).split()
                 return asunto
 
-def create_credencial():
+def create_credencial() -> Credentials:
     if os.path.exists('token.json'):
         with open('token.json', 'r'):
             credencial = Credentials.from_authorized_user_file('token.json', SCOPES)
     return credencial
 
-def lista_alumnos(alumnos, padrones, mail_alumnos) -> list:
+def lista_alumnos(alumnos: list, padrones: list, mail_alumnos: list) -> None:
     with open("alumnos.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
@@ -42,13 +42,13 @@ def lista_alumnos(alumnos, padrones, mail_alumnos) -> list:
             padrones.append(linea[1])
             mail_alumnos.append(linea[2])
     
-def mail_docentes(profesores):
+def mail_docentes(profesores: dict)-> None:
     with open("docentes.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
             profesores[linea[0]]=linea[1]
 
-def correctores(docente_alumno):
+def correctores(docente_alumno: dict)-> None:
     with open("docente-alumno.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
@@ -57,14 +57,14 @@ def correctores(docente_alumno):
             else :
                 docente_alumno[linea[0]]=linea[1]
 
-def enviar_mensaje(alumnos, padrones, mail_alumnos, mail_profesores, docente_alumno)-> None:
+def enviar_mensaje(alumnos: list, padrones: list, mail_alumnos: list, profesores: dict, docente_alumno: dict)-> None:
     credencial = create_credencial()
     serv= build('gmail', 'v1', credentials=credencial)
     
     for i in alumnos:
         for n in docente_alumno:
             if alumnos[i] in docente_alumno[n]:
-                gmail_de = mail_profesores[n]
+                gmail_de = profesores[n]
         gmail_para = mail_alumnos[i]
         if leer_asunto()[1] == padrones[i]:
             mensaje ="La entrega fue exitosa"
@@ -88,7 +88,7 @@ def enviar_mensaje(alumnos, padrones, mail_alumnos, mail_profesores, docente_alu
 
 
 
-def main():
+def main()-> None:
     alumnos = []
     padrones=[]
     mail_alumnos=[]
