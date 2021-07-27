@@ -85,7 +85,7 @@ def crear_nombre_archivo(id_archivo: str, anidacion: str) -> None:
 def verificar_id(anidacion: str) -> None:
     lista_id = []
     id_archivo = input("Ingrese el id de su archivo: ")
-    response = obtener_servicio().files().list(q = "mimeType = 'application/vnd.google-apps.file'").execute()
+    response = obtener_servicio().files().list(q = "mimeType != 'application/vnd.google-apps.folder'").execute()
     for file in response.get('files', []):
         ids = file.get('id')
         lista_id.append(ids)
