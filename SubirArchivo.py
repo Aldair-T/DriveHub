@@ -2,7 +2,7 @@ import os
 from service_drive import obtener_servicio
 from googleapiclient.http import MediaFileUpload
 from ListadoArchivos import repo_local
-from DescargarArchivos import tipos_archivos, elegir_extencion
+from DescargarArchivos import tipos_archivos, elegir_extension
 
 
 def subir_a_unidad(nombre: str, ruta_archivo: str, tipo_archivo: str) -> None:
@@ -54,7 +54,7 @@ def subir_archivos() -> None:
     tipo_archivo = input("Ingrese el tipo de archivo: ")
     while not tipo_archivo.isnumeric() or int(tipo_archivo) < 1 or int(tipo_archivo) > 8:
         tipo_archivo = input("Ingrese una opcion correcta: ")
-    tipo_archivo = elegir_extencion(tipo_archivo)
+    tipo_archivo = elegir_extension(tipo_archivo)
     if os.path.isfile(ruta_archivo):
         elegir_datos(ruta_archivo, tipo_archivo[0])
     else:

@@ -17,7 +17,7 @@ def tipos_archivos() -> None:
           "8)Excel\n")
 
 
-def elegir_extencion(archivo_elegido: str) -> list:
+def elegir_extension(archivo_elegido: str) -> list:
     if int(archivo_elegido) == 1:
         return ['application/pdf', '.pdf']
     elif int(archivo_elegido) == 2:
@@ -66,7 +66,7 @@ def crear_nombre_archivo(anidacion: str) -> None:
     tipo_a = input("Ingres el tipo de archivo: ")
     while not tipo_a.isnumeric() or int(tipo_a) < 1 or int(tipo_a) > 8:
         tipo_a = input("Ingrese una opcion correcta: ")
-    tipo_extension = elegir_extencion(tipo_a)
+    tipo_extension = elegir_extension(tipo_a)
     nombre_archivo += tipo_extension[1]
     if 1 <= int(tipo_a) <= 5:
         descargar_archivos_media(ids_archivo, nombre_archivo, anidacion)
