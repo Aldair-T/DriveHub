@@ -47,7 +47,7 @@ def creacion_carpeta_docentes(carpeta_examenes_ID: str) -> None:
         creacion_carpeta_alumnos(carpeta_docente_ID,docente)
 
 
-def creacion_carpeta(nombre: str)-> None:
+def creacion_carpeta_examen(nombre: str)-> None:
 
     file_metadata = {
         'name': nombre,
@@ -84,7 +84,7 @@ def leer_mail(carpetas_en_drive: list) -> None:
                 if asunto[0] == "nombre_examen":
                     if asunto[1] not in carpetas_en_drive:
                         nombre_examen = asunto[1]
-                        creacion_carpeta(nombre_examen)
+                        creacion_carpeta_examen(nombre_examen)
 
 
 def carpetas_encontradas() -> None:
