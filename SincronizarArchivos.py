@@ -4,13 +4,15 @@ from datetime import datetime
 from service_drive import obtener_servicio
 from SubirArchivo import subir_a_unidad
 from DescargarArchivos import descargar_archivo_media, archivos_drive
+
+
 def archivos_local() -> dict:
     directorio_usuario = os.getcwd()
     carpetas = pathlib.Path(directorio_usuario)
     archivos_locales = {}
     for archivo in carpetas.iterdir():
         ruta_archivo = os.getcwd() + "\\" + archivo.name
-        modificacion_local = datetime.utcfromtimestamp(os.path.getmtime(archivo))
+        modificacion_local = datetime.utcfromtimestamp(os.path.getmtime(archivo)) # 2020-05-30 12:30:45.345
         archivos_locales[archivo.name] = [modificacion_local, ruta_archivo]
         # {'nombre archivo': ultima modificacion}
     return archivos_locales
