@@ -18,7 +18,7 @@ def importar_archivos(alumnos):
             #utilizar nombre para guardar archivo en carpeta
         
 
-def padron_con_nombre():
+def padron_con_nombre(alumnos):
     with open("alumnos.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
