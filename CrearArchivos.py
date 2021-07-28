@@ -11,10 +11,10 @@ def tipos_archivos() -> None:
           "3) Crear un archivo .txt\n"
           "4) Crear un archivo .csv\n"
           "5) Crear un archivo .jpg\n"
-          "6) Crear un archivo Word\n"
-          "7) Crear un archivo PowerPoint\n"
+          "6) Crear un archivo PowerPoint\n"
+          "7) Crear un archivo Word\n"
           "8) Crear un archivo Excel\n"
-          "10) Crear una carpeta")
+          "9) Crear una carpeta")
 
 
 def crear_carpeta_drive(nombre_carpeta: str):
@@ -61,10 +61,10 @@ def creacion_archivos() -> None:
     # Es el menu para ver que archivo va a crear
     tipos_archivos()
     opcion = input("Que quieres crear: ")
-    while not opcion.isnumeric() or int(opcion) < 1 or int(opcion) > 10:
+    while not opcion.isnumeric() or int(opcion) < 1 or int(opcion) > 9:
         opcion = input("Ingrese una opcion correcta: ")
     extension = elegir_extension(opcion)
-    if int(opcion) == 10:
+    if int(opcion) == 9:
         crear_carpeta()
     else:
         crear_archivo_local(extension[0], extension[1])

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from googleapiclient.http import MediaIoBaseDownload
 from service_drive import obtener_servicio
 import os
@@ -10,8 +12,8 @@ def tipos_archivos() -> None:
           "3)Text\n"
           "4)Csv\n"
           "5)Imagen\n"
-          "6)Word\n"
-          "7)PowerPoint\n"
+          "6)PowerPoint\n"
+          "7)Word\n"
           "8)Excel\n")
 
 
@@ -32,21 +34,34 @@ def elegir_extension(archivo_elegido: str) -> list:
         extension = '.csv'
     elif int(archivo_elegido) == 5:
         mimeType = 'image/jpeg'
-        extension = '.jpg'
+        extension = '.jpeg'
     elif int(archivo_elegido) == 6:
-        mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        extension = '.docx'
-    elif int(archivo_elegido) == 7:
         mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
         extension = '.pptx'
+    elif int(archivo_elegido) == 7:
+        mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        extension = '.docx'
     elif int(archivo_elegido) == 8:
         mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         extension = '.xlsx'
     return [mimeType, extension]
 
+def archivos_drive() -> dict:
+    archivos_remotos = {}
+    respuesta = obtener_servicio().files().list(q = "mimeType != 'application/vnd.google-apps.folder'",
+                                                fields = 'files(id, name, modifiedTime, mimeType)').execute()
+    for file in respuesta.get('files', []):
+        tiempo = file.get('modifiedTime')  # obtengo la ultima modificacion
+        modificacion_drive = datetime.strptime(tiempo, "%Y-%m-%dT%H:%M:%S.%fZ")
+        nombre = file.get('name')
+        id_archivo = file.get('id')
+        mimeType = file.get('mimeType')
+        archivos_remotos[nombre] = [modificacion_drive, id_archivo, mimeType]  # aca guardo todos los archivos
+        # {'nombre archivo': [ultima modific, id archivo]}
+    return archivos_remotos
 
-def descargar_archivos_media(ids_archivos: str, nombre_archivo: str, anidacion: str) -> None:
-    respuesta = obtener_servicio().files().get_media(fileId = ids_archivos)
+def descargar_archivo_media(id_archivo: str, nombre_archivo: str, anidacion: str) -> None:
+    respuesta = obtener_servicio().files().get_media(fileId = id_archivo)
     fh = io.BytesIO()
     descarga = MediaIoBaseDownload(fd = fh, request = respuesta)
     salir = False
@@ -54,46 +69,21 @@ def descargar_archivos_media(ids_archivos: str, nombre_archivo: str, anidacion: 
         status, salir = descarga.next_chunk()
         print("Se descargo su archivo con exito")
     fh.seek(0)
-    with open(os.path.join(anidacion, nombre_archivo), 'wb', encoding = "utf-8") as f:
+    with open(os.path.join(anidacion, nombre_archivo), 'wb') as f:
         f.write(fh.read())
         f.close()
 
-
-def descargar_archivos_workspace(ids_archivo: str, tipo_archivo: str, nombre_archivo: str, anidacion: str) -> None:
-    byteData = obtener_servicio().files().export_media(
-        fileId = ids_archivo,
-        mimeType = tipo_archivo).execute()
-    with open(os.path.join(anidacion, nombre_archivo), 'wb', encoding = "utf-8") as f:
-        f.write(byteData)
-        f.close()
-
-
-def crear_nombre_archivo(id_archivo: str, anidacion: str) -> None:
-    nombre_archivo = input("Ingrese el nuevo nombre: ")
-    tipos_archivos()
-    tipo_a = input("Ingres el tipo de archivo: ")
-    while not tipo_a.isnumeric() or int(tipo_a) < 1 or int(tipo_a) > 8:
-        tipo_a = input("Ingrese una opcion correcta: ")
-    tipo_extension = elegir_extension(tipo_a)
-    nombre_archivo += tipo_extension[1]
-    if 1 <= int(tipo_a) <= 5:
-        descargar_archivos_media(id_archivo, nombre_archivo, anidacion)
-    elif int(tipo_a) >= 6:
-        descargar_archivos_workspace(id_archivo, tipo_extension[0], nombre_archivo, anidacion)
-
-
 def verificar_id(anidacion: str) -> None:
-    lista_id = []
     id_archivo = input("Ingrese el id de su archivo: ")
-    response = obtener_servicio().files().list(q = "mimeType != 'application/vnd.google-apps.folder'").execute()
-    for file in response.get('files', []):
-        ids = file.get('id')
-        lista_id.append(ids)
+    lista_id = []
+    archivo_drive = archivos_drive()
+    for clave, valor in archivo_drive.items():
+        lista_id.append(valor[1])
     if id_archivo in lista_id:
-        crear_nombre_archivo(id_archivo, anidacion)
+        nombre_archivo = input("Ingrese el nuevo nombre: ")
+        descargar_archivo_media(id_archivo, nombre_archivo, anidacion)
     else:
-        print("No existe ese archivo en tu drive")
-
+        print("No existe ese archivo en drive")
 
 def listado_repo_local(carpetas_anidadas: list, carpeta: str) -> list:
     # Lista los archivos del parámetro pasado
