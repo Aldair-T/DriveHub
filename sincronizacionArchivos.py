@@ -46,13 +46,20 @@ def obtener_tiempo(archivo) -> str:
     return tiempo_formateado
 
 
-def obtener_extension_archivo(ID_archivo: str) -> str:
+def obtener_extension_archivo(nombre_archivo:str, ID_archivo: str) -> str:
 
     servicio_archivo = obtener_servicio().files()
-    informacion_archivo = servicio_archivo.get(fileId=ID_archivo, fields="fileExtension").execute()
-    extension_archivo = "." + informacion_archivo['fileExtension']
-    
-    return extension_archivo
+    informacion_archivo = servicio_archivo.get(fileId=ID_archivo,fields= 'fileExtension').execute()
+    if len(informacion_archivo) == 0:
+        informacion_archivo = servicio_archivo.get(fileId=ID_archivo,fields= 'mimeType').execute()
+        if informacion_archivo['mimeType'] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            extension_archivo = ".docx"
+            nombre_archivo += extension_archivo
+        elif informacion_archivo['mimeType'] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+            extension_archivo = ".xlsx"
+            nombre_archivo += extension_archivo
+    return nombre_archivo
+
 
 
 def dar_formato_tiempo(lista_fechas: list) -> str:
@@ -101,15 +108,14 @@ def modificar_estructura(tiempo: str) -> str:
 def archivos_drive() -> dict:
     # aca creo el diccionario de los archivos remotos para despues compararlo
     archivos_remotos = {}
-    respuesta = obtener_servicio().files().list(fields = 'files(id, name, modifiedTime)').execute() # obtengo todos los
-    # archivos
+    respuesta = obtener_servicio().files().list(q = "mimeType != 'application/vnd.google-apps.folder'",fields = 'files(id, name, modifiedTime)').execute()
+
     for file in respuesta.get('files', []):
         tiempo = file.get('modifiedTime') # obtengo la ultima modificacion
         tiempo = modificar_estructura(tiempo) # le doy estructura pero creo q hay q hacerlo de otra manera
         nombre = file.get('name')
         id_archivo = file.get('id')
-        extension_archivo = obtener_extension_archivo(id_archivo)
-        nombre += extension_archivo
+        nombre = obtener_extension_archivo(nombre,id_archivo)
         archivos_remotos[nombre] = [tiempo, id_archivo] # aca guardo todos los archivos
         # {'nombre archivo': [ultima modific, id archivo]}
     return archivos_remotos
@@ -124,7 +130,7 @@ def descargar_media_drive(nombre_archivo: str,id_archivos: str,ruta_archivo: str
         status, salir = descarga.next_chunk()
         print("Se descargo su archivo con exito")
     fh.seek(0)
-    with open(os.path.join(ruta_archivo, nombre_archivo), 'wb', encoding = "utf-8") as f:
+    with open(os.path.join(ruta_archivo, nombre_archivo), 'wb') as f:
         f.write(fh.read())
         f.close()
 
@@ -181,12 +187,13 @@ def subir_modific_local(nombre_archivo: str, id_archivo: str) -> None:
 def sincronizacion() -> None:
     dict_local = archivos_local() 
     dict_drive = archivos_drive()  
+
     for nombres_local, modificacion_local in dict_local.items():
         for nombres_drive, modificacion_drive in dict_drive.items():
             if nombres_local == nombres_drive:  
-                if modificacion_drive < modificacion_local: 
+                if int(modificacion_drive[0]) < int(modificacion_local): 
                     subir_modific_drive(nombres_local, modificacion_drive[1])
-                elif modificacion_drive > modificacion_local: 
+                elif int(modificacion_drive[0]) > int(modificacion_local): 
                     subir_modific_local(nombres_local, modificacion_drive[1])
 
 sincronizacion()
