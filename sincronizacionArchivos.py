@@ -84,10 +84,15 @@ def archivos_local() -> dict:
 def retornar_formato_tiempo(lista: list) -> str:
 
     lista_formato = []
-    for i in lista[0:14]:
+    if len(lista) == 17: # esto depende si el mes tiene o no un 0
+        for i in lista[0:12]:
+            lista_formato.append(i)
+    if len(lista) == 18:
+        for i in lista[0:13]:
             lista_formato.append(i)
     cadena = "".join(lista_formato)
-    return cadena 
+    return cadena
+
 
 
 def modificar_estructura(tiempo: str) -> str:
@@ -102,6 +107,8 @@ def modificar_estructura(tiempo: str) -> str:
         lista_tiempo.remove(".")# elimino las cosas q no me interesan
         lista_tiempo.remove(":")
         lista_tiempo.remove(":")
+        if "0" == lista_tiempo[4]: # si el mes tiene 0 lo elimino
+            lista_tiempo.pop(4)
     return retornar_formato_tiempo(lista_tiempo) # me retorna esto: 2020712123456945Z en una lista
 
 
@@ -142,7 +149,7 @@ def descargar_workspace_drive(nombre_archivo: str,id_archivos: str,ruta_archivo:
     byteData = obtener_servicio().files().export_media(
         fileId = id_archivos,
         mimeType = tipo_archivo).execute()
-    with open(os.path.join(ruta_archivo, nombre_archivo), 'wb', encoding = "utf-8") as f:
+    with open(os.path.join(ruta_archivo,nombre_archivo), 'w') as f:
         f.write(byteData)
         f.close()
 
@@ -151,7 +158,7 @@ def subir_modific_drive(nombre_archivo: str, id_archivo: str) -> None:
     
     tipo_archivo,nombre = definir_tipo_archivo(nombre_archivo)
 
-    ruta_archivo = os.getcwd + "\\" + nombre_archivo
+    ruta_archivo = os.getcwd() + "\\" + nombre_archivo
 
     obtener_servicio().files().delete(fileId = id_archivo)
 
@@ -160,14 +167,13 @@ def subir_modific_drive(nombre_archivo: str, id_archivo: str) -> None:
     obtener_servicio().files().create(body = file_metadata,
                                       media_body = media,
                                       fields = 'id').execute()
-
     print("Su archivo se subió con éxito")
 
 
 
-def subir_modific_local(nombre_archivo: str, id_archivo: str) -> None:
+def descargar_modific_drive(nombre_archivo: str, id_archivo_drive: str) -> None:
 
-    lista_extensiones = [".docx",".xlsx",".pptx"]
+    lista_extensiones = [".docx",".xlsx"]
 
     ruta_archivo = os.getcwd()
 
@@ -178,9 +184,9 @@ def subir_modific_local(nombre_archivo: str, id_archivo: str) -> None:
             workspace = True
 
     if workspace:
-        descargar_workspace_drive(nombre_archivo,id_archivo,ruta_archivo)
+        descargar_workspace_drive(nombre_archivo,id_archivo_drive,ruta_archivo)
     else:
-        descargar_media_drive(nombre_archivo,id_archivo,ruta_archivo)
+        descargar_media_drive(nombre_archivo,id_archivo_drive,ruta_archivo)
 
 
 
@@ -194,6 +200,6 @@ def sincronizacion() -> None:
                 if int(modificacion_drive[0]) < int(modificacion_local): 
                     subir_modific_drive(nombres_local, modificacion_drive[1])
                 elif int(modificacion_drive[0]) > int(modificacion_local): 
-                    subir_modific_local(nombres_local, modificacion_drive[1])
+                    descargar_modific_drive(nombres_local, modificacion_drive[1])
 
 sincronizacion()
