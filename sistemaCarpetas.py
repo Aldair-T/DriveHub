@@ -65,7 +65,6 @@ def leer_mail(carpetas_en_drive: list) -> None:
 
     resultados = SERVICE_GMAIL().users().messages().list(userId='me').execute()
 
-
     id_mails = []
     contador = 0
     
@@ -97,8 +96,6 @@ def carpetas_encontradas() -> None:
         carpetas_en_drive.append(carpeta['name'])
     
     leer_mail(carpetas_en_drive)
-
-
 
 
 
