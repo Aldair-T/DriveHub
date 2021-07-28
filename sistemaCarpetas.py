@@ -6,7 +6,7 @@ import csv
 def creacion_carpeta_alumnos(carpeta_docente_ID: str,docente: str) -> None:
     lista_alumnos = []
 
-    with open("docente-alumno.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
+    with open("docente-alumnos.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
             if linea[0] == docente:
