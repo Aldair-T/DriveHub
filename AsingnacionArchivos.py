@@ -1,7 +1,7 @@
 from service_drive import obtener_servicio as SERVICE_DRIVE
 from service_gmail import obtener_servicio as SERVICE_GMAIL
 import csv
-
+    
 def importar_archivos() -> None:
     nombres = []
     padrones=[]
@@ -15,8 +15,7 @@ def importar_archivos() -> None:
         contador += 1
     for id_mail in id_mails:
         mail = SERVICE_GMAIL().users().messages().get(userId='me', id=id_mail, format='full').execute()
-        archivo_ad = SERVICE_GMAIL().users().messages().attachments().get(userId='me', messageId=id_mail,id=id_mail).execute()
-        for valor in archivo_ad:
+        for valor in mail:
             id_archivo = valor['attachmentId']
         for valor in mail['payload']['headers']:
             if valor['name'] == 'Subject':
