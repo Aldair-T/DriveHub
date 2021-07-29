@@ -46,9 +46,6 @@ def leer_asunto(alumnos: list, padrones: list, mail_alumnos: list, profesores: d
                     else:
                         return  ("entrega fallida")
 
-
-
-
 def create_credencial() -> Credentials:
     if os.path.exists('token.json'):
         with open('token.json', 'r'):
