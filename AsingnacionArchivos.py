@@ -3,7 +3,7 @@ from service_gmail import obtener_servicio as SERVICE_GMAIL
 import csv
 
 
-def importar_archivos(alumnos, padrones):
+def importar_archivos(alumnos: list, padrones: list) -> None:
     resultados = SERVICE_GMAIL().users().messages().list(userId='me').execute()
     id_mails = []
     contador = 0
@@ -25,7 +25,7 @@ def importar_archivos(alumnos, padrones):
                                          ).execute()
             
 
-def buscar_carpeta(nombre_alumno: str) ->  None:
+def buscar_carpeta(nombre_alumno: str) ->  str:
     id_ = input("Ingrese el nombre de la carpeta: ")
     carpetas_en_drive = {}
     carpetas_profesores = {}
@@ -56,7 +56,7 @@ def buscar_carpeta(nombre_alumno: str) ->  None:
             print("El archivo tiene que pasar de gmail a drive")
             return carpeta_id_alum
 
-def alumnos(nombres, padrones):
+def alumnos(nombres: list, padrones: list)-> None:
     with open("alumnos.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
