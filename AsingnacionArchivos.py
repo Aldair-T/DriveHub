@@ -15,7 +15,8 @@ def importar_archivos() -> None:
         contador += 1
     for id_mail in id_mails:
         mail = SERVICE_GMAIL().users().messages().get(userId='me', id=id_mail, format='full').execute()
-        for valor in mail['payload']['body']:
+        archivo_ad = SERVICE_GMAIL().users().messages().attachments().get(userId='me', messageId=id_mail,id=id_mail).execute()
+        for valor in archivo_ad:
             id_archivo = valor['attachmentId']
         for valor in mail['payload']['headers']:
             if valor['name'] == 'Subject':
@@ -46,9 +47,7 @@ def buscar_carpeta(nombre_alumno: str) ->  str:
                 carpeta_evaluacion = archivos.get('id')
                 carpetas_profesores[nombre_carpeta] = carpeta_evaluacion
     for clave, valor in carpetas_profesores.items():
-        query2 = f"parents = '{valor}' and mimeType = 'application/vnd.google-apps.folder'"
-        respuesta2 = SERVICE_DRIVE().files().list(q = query2, fields = 'files(id, name)').execute()
-        for carpeta_alum in respuesta2.get('files', []):
+        for carpeta_alum in respuesta.get('files', []):
             nombre_carpeta_alum = carpeta_alum.get('name')
             carpeta_id_alum = carpeta_alum.get('id')
             carpetas_alumnos[nombre_carpeta_alum] = carpeta_id_alum
