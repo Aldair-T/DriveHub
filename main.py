@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from Recepcion_de_entregas import enviar_mensaje
+from Recepcion_entregas import enviar_mensaje
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from service_drive import obtener_servicio as SERVICE_DRIVE
 from service_gmail import obtener_servicio as SERVICE_GMAIL
