@@ -2,7 +2,6 @@ from service_drive import obtener_servicio as SERVICE_DRIVE
 from service_gmail import obtener_servicio as SERVICE_GMAIL
 import csv
 
-
 def importar_archivos() -> None:
     nombres = []
     padrones=[]
@@ -22,9 +21,9 @@ def importar_archivos() -> None:
                 for i in range (len(nombres)):
                     if asunto[1] == padrones[i]:
                         archivo = SERVICE_GMAIL().users().attachments().get(userId='me', messageId=mail_ID, x__xgafv=None).execute()
-                        target_folder_id= buscar_carpeta(nombres[i])
+                        carpeta_id= buscar_carpeta(nombres[i])
                         SERVICE_DRIVE.files().update(fileId = archivo.get("id"),
-                                        addParents = target_folder_id,
+                                        addParents = carpeta_id,
                                          ).execute()
             
 
