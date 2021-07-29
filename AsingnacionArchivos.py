@@ -15,7 +15,7 @@ def importar_archivos() -> None:
         contador += 1
     for id_mail in id_mails:
         mail = SERVICE_GMAIL().users().messages().get(userId='me', id=id_mail, format='full').execute()
-        for valor in mail:
+        for valor in mail['payload']['body']:
             id_archivo = valor['attachmentId']
         for valor in mail['payload']['headers']:
             if valor['name'] == 'Subject':
