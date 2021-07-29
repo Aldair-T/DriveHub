@@ -3,7 +3,10 @@ from service_gmail import obtener_servicio as SERVICE_GMAIL
 import csv
 
 
-def importar_archivos(nombres: list, padrones: list) -> None:
+def importar_archivos() -> None:
+    nombres = []
+    padrones=[]
+    alumnos(nombres, padrones)
     resultados = SERVICE_GMAIL().users().messages().list(userId='me').execute()
     id_mails = []
     contador = 0
@@ -64,9 +67,6 @@ def alumnos(nombres: list, padrones: list)-> None:
             padrones.append(linea[1])
     
 def main():
-    nombres = []
-    padrones=[]
-    alumnos(nombres, padrones)
-    importar_archivos(nombres, padrones)
+    importar_archivos()
 
 main()
