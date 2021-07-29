@@ -1,17 +1,20 @@
-mport base64
+import base64
 from email.mime.text import MIMEText
 from email import errors
 import os
 import csv
+from AsignacionArchivos import importar_archivos
 
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
+
 ARCHIVO_SECRET_CLIENT = 'client_secret.json'
 SCOPES = [
     'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/gmail.send'
 ]
-def leer_asunto(alumnos: list, padrones: list, mail_alumnos: list, profesores: dict, docente_alumno: dict) -> None:
+
+def leer_asunto(alumnos: list, padrones: list) -> None:
     credencial = create_credencial()
     serv= build('gmail', 'v1', credentials=credencial)
     resultados = serv.users().messages().list(userId='me', q="is:unread").execute()
@@ -47,29 +50,14 @@ def lista_alumnos(alumnos: list, padrones: list, mail_alumnos: list) -> None:
         for linea in csv_reader:
             alumnos.append(linea[0])
             padrones.append(linea[1])
-            mail_alumnos.append(linea[2])
     
-def mail_docentes(profesores: dict)-> None:
-    with open("docentes.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
-        csv_reader = csv.reader(archivo_csv,delimiter=',')
-        for linea in csv_reader:
-            profesores[linea[0]]=linea[1]
-
-def correctores(docente_alumno: dict)-> None:
-    with open("docente-alumno.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
-        csv_reader = csv.reader(archivo_csv,delimiter=',')
-        for linea in csv_reader:
-            docente_alumno[linea[1]]=linea[0]
-
 def enviar_mensaje()-> None:
     alumnos = []
     padrones=[]
     mail_alumnos=[]
     profesores={}
     docente_alumno={}
-    lista_alumnos(alumnos, padrones, mail_alumnos)
-    mail_docentes(profesores)
-    correctores(docente_alumno)
+    lista_alumnos(alumnos, padrones)
     credencial = create_credencial()
     serv= build('gmail', 'v1', credentials=credencial)
     
@@ -77,8 +65,10 @@ def enviar_mensaje()-> None:
         if alumnos[i] in docente_alumno:
             gmail_de = profesores[docente_alumno[alumnos[i]]]
         gmail_para = mail_alumnos[i]
-        mensaje = leer_asunto(alumnos, padrones, mail_alumnos, profesores, docente_alumno)
-    
+        mensaje = leer_asunto(alumnos, padrones)
+        if mensaje =="La entrega fue exitosa":
+            importar_archivos()
+
     message = MIMEText(mensaje)
     message['to'] = gmail_para
     message['from'] = gmail_de
