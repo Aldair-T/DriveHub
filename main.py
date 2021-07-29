@@ -56,7 +56,7 @@ def tipos_archivos_creacion() -> None:
           "6) Crear un archivo PowerPoint\n"
           "7) Crear un archivo Word\n"
           "8) Crear un archivo Excel\n"
-          "9) Crear una carpeta"
+          "9) Crear una carpeta\n"
           "10) Menu principal")
 
 
@@ -373,24 +373,17 @@ def sincronizar() -> None:
     for nombres_local, modificacion_local in dict_local.items():
         for nombres_drive, modificacion_drive in dict_drive.items():
             if nombres_local == nombres_drive:
-                print(modificacion_local[0])
-                print(modificacion_drive[0])
                 if modificacion_local[0] > modificacion_drive[0]:
-                    print("hl")
                     SERVICE_DRIVE().files().delete(fileId = modificacion_drive[1])
-                    print(nombres_local)
                     subir_a_unidad(nombres_local, modificacion_local[1], modificacion_drive[2])
                 elif modificacion_drive[0] > modificacion_local[0]:
-                    print("as")
                     os.remove(modificacion_local[1])
-                    print(nombres_drive)
                     descargar_archivo_media(modificacion_drive[1], nombres_drive, os.getcwd())
                 else:
                     print("No hay archivos para modificar")
 
 
 def creacion_carpeta_alumnos(carpeta_docente_ID: str, docente: str) -> None:
-    print("asdhae")
     lista_alumnos = []
 
     with open("docente-alumnos.csv", mode = 'r', newline = '', encoding = "UTF-8") as archivo_csv:
@@ -410,7 +403,6 @@ def creacion_carpeta_alumnos(carpeta_docente_ID: str, docente: str) -> None:
 
 
 def creacion_carpeta_docentes(carpeta_examenes_ID: str) -> None:
-    print("PLOA")
     lista_docentes = []
 
     with open("docentes.csv", mode = 'r', newline = '', encoding = "UTF-8") as archivo_csv:
@@ -432,7 +424,6 @@ def creacion_carpeta_docentes(carpeta_examenes_ID: str) -> None:
 
 
 def creacion_carpeta_examen(nombre: str) -> None:
-    print("Oas")
     file_metadata = {
         'name': nombre,
         'mimeType': 'application/vnd.google-apps.folder'
@@ -446,7 +437,6 @@ def creacion_carpeta_examen(nombre: str) -> None:
 
 
 def leer_mail(carpetas_en_drive: list) -> None:
-    print("Nasda")
     resultados = SERVICE_GMAIL().users().messages().list(userId = 'me').execute()
 
     id_mails = []
@@ -464,14 +454,13 @@ def leer_mail(carpetas_en_drive: list) -> None:
         for valor in mail['payload']['headers']:
             if valor['name'] == 'Subject':
                 asunto = (valor['value']).split()
-                if asunto[0] == "nombre_examen":
+                if ((asunto[0]).lower()) == "nombre_examen":
                     if asunto[1] not in carpetas_en_drive:
                         nombre_examen = asunto[1]
                         creacion_carpeta_examen(nombre_examen)
 
 
 def carpetas_encontradas() -> None:
-    print("NOasas")
     carpetas_en_drive = list()
 
     carpetas = SERVICE_DRIVE().files().list(q = "mimeType = 'application/vnd.google-apps.folder'").execute()
@@ -505,7 +494,7 @@ def main() -> None:
     acceso = True
     opcion = input("Ingrese una opcion: ")
     opcion = opcion_valida(opcion)
-    while acceso == True:
+    while acceso:
         if opcion == 1:
             listar_archivos()
         if opcion == 2:
@@ -522,6 +511,5 @@ def main() -> None:
             pass
         if opcion == 8:
             acceso = False
-
 
 main()
