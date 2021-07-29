@@ -41,6 +41,8 @@ def leer_asunto(alumnos: list, padrones: list, mail_alumnos: list, profesores: d
                         return ("nombre no coincide con padron")
                     elif asunto[1] not in padrones:
                         return ("padron incorrecto")
+                    elif para[2] != profesores[docente_alumno[alumnos[i]]]:
+                        return ("enviado al corrector equivocado")
                     elif de[2] not in mail_alumnos:
                         return ("enviado con mail que no corresponde")
                     else:
