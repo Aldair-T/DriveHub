@@ -3,7 +3,7 @@ from service_gmail import obtener_servicio as SERVICE_GMAIL
 import csv
 
 
-def importar_archivos(alumnos: list, padrones: list) -> None:
+def importar_archivos(nombres: list, padrones: list) -> None:
     resultados = SERVICE_GMAIL().users().messages().list(userId='me').execute()
     id_mails = []
     contador = 0
@@ -16,10 +16,10 @@ def importar_archivos(alumnos: list, padrones: list) -> None:
         for valor in mail['payload']['headers']:
             if valor['name'] == 'Subject':
                 asunto = (valor['value']).split()
-                for i in range (len (alumnos)):
+                for i in range (len(nombres)):
                     if asunto[1] == padrones[i]:
                         archivo = SERVICE_GMAIL().users().attachments().get(userId='me', messageId=mail_ID, x__xgafv=None).execute()
-                        target_folder_id= buscar_carpeta(alumnos[i])
+                        target_folder_id= buscar_carpeta(nombres[i])
                         SERVICE_DRIVE.files().update(fileId = archivo.get("id"),
                                         addParents = target_folder_id,
                                          ).execute()
@@ -67,6 +67,6 @@ def main():
     nombres = []
     padrones=[]
     alumnos(nombres, padrones)
-    importar_archivos(nombres)
+    importar_archivos(nombres, padrones)
 
 main()
