@@ -1,4 +1,4 @@
-import base64
+mport base64
 from email.mime.text import MIMEText
 from email import errors
 import os
@@ -79,12 +79,10 @@ def enviar_mensaje()-> None:
         gmail_para = mail_alumnos[i]
         mensaje = leer_asunto(alumnos, padrones, mail_alumnos, profesores, docente_alumno)
     
-    asunto ="Entrega"
-
     message = MIMEText(mensaje)
     message['to'] = gmail_para
     message['from'] = gmail_de
-    message['subject'] = asunto
+    message['subject'] = "Entrega"
     raw = base64.urlsafe_b64encode(message.as_bytes())
     raw = raw.decode()
     body= {'raw': raw}
