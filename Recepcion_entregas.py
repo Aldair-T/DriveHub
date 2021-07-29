@@ -16,7 +16,9 @@ SCOPES = [
 ]
 
 def leer_asunto(alumnos: list, padrones: list, mail_alumnos: list, profesores: dict, docente_alumno: dict) -> None:
-
+    #Pre: Recibe 3 listas, con nombres de alumnos, sus padrones y sus mail's, un diccionario de profesores y otro#
+    #diccionario de profesores-alumnos#
+    #Post: Dependiendo de las condiciones de la entrega nos retorna distintos mensajes#
 
     credencial = create_credencial()
     serv= build('gmail', 'v1', credentials=credencial)
@@ -57,8 +59,8 @@ def create_credencial() -> Credentials:
     return credencial
 
 def lista_alumnos(alumnos: list, padrones: list, mail_alumnos: list) -> None:
-#pre # 
-#post #
+#Pre: Recibe 3 listas vacias#
+#Post: Y cada una se le agrega los nombres, padrones y los mail's de cada uno#
 
     with open("alumnos.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
@@ -68,22 +70,26 @@ def lista_alumnos(alumnos: list, padrones: list, mail_alumnos: list) -> None:
             mail_alumnos.append("<"+linea[2]+">")
     
 def mail_docentes(profesores: dict)-> None:
-#pre # 
-#post #
+#Pre: Recibe un diccionario vacio#
+#Post: Llena el diccionario con el mail que tiene cada docente#
+
     with open("docentes.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
             profesores[linea[0]]="<"+linea[1]+">"
 
 def correctores(docente_alumno: dict)-> None:
-#pre # 
-#post #
+#Pre: Recibe un diccionario vacio#
+#Post: Llena el diccionario para ver que corrector le toca a cada uno#
+
     with open("docente-alumno.csv", mode= 'r',newline= '', encoding= "UTF-8") as archivo_csv:
         csv_reader = csv.reader(archivo_csv,delimiter=',')
         for linea in csv_reader:
             docente_alumno[linea[1]]=linea[0]
 
 def enviar_mensaje()-> None:
+#  Post: Lee el mensaje recibido y envía un mail si la entrega fue exitosa o no, y asigna los archivos#
+# enviados a cada uno#
 
     alumnos = []
     padrones=[]
