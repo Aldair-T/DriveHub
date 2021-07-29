@@ -1,7 +1,6 @@
 from datetime import datetime
-from email.mime.text import MIMEText
 from pathlib import Path
-from email import errors
+from Recepcion_de_entregas import enviar_mensaje
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from service_drive import obtener_servicio as SERVICE_DRIVE
 from service_gmail import obtener_servicio as SERVICE_GMAIL
@@ -9,7 +8,6 @@ import os
 import io
 import pathlib
 import csv
-import base64
 
 
 def menu() -> None:
@@ -565,179 +563,6 @@ def carpetas_encontradas() -> None:
     for carpeta in carpetas['files']:
         carpetas_en_drive.append(carpeta['name'])
     leer_mail(carpetas_en_drive)
-
-
-def importar_archivos() -> None:
-    nombres = []
-    padrones = []
-    alumnos(nombres, padrones)
-    resultados = SERVICE_GMAIL().users().messages().list(userId = 'me').execute()
-    id_mails = []
-    contador = 0
-    for mail in resultados['messages']:
-        mail_ID = (resultados['messages'][contador]['id'])
-        id_mails.append(mail_ID)
-        contador += 1
-    for id_mail in id_mails:
-        mail = SERVICE_GMAIL().users().messages().get(userId = 'me', id = id_mail, format = 'full').execute()
-        for valor in mail['payload']['filename']:
-            if valor['body']:
-                att_id = valor['attachmentId']
-                att = SERVICE_GMAIL().users().messages().attachments().get(userId = 'me', messageId = id_mail,
-                                                                           id = att_id).execute()
-            for valor2 in mail['payload']['headers']:
-                if valor2['name'] == 'Subject':
-                    asunto = (valor2['value']).split()
-                    for i in range(len(padrones)):
-                        if asunto[1] == padrones[i]:
-                            carpeta_id = buscar_carpeta(nombres[i])
-                            SERVICE_DRIVE.files().update(fileId = att, addParents = carpeta_id, ).execute()
-
-
-def buscar_carpeta(nombre_alumno: str) -> str:
-    id_ = input("Ingrese el nombre de la carpeta: ")
-    carpetas_en_drive = {}
-    carpetas_profesores = {}
-    carpetas_alumnos = {}
-    carpetas = SERVICE_DRIVE().files().list(q = "mimeType = 'application/vnd.google-apps.folder'",
-                                            fields = 'files(id, name)').execute()
-    for carpeta in carpetas['files']:
-        nombre = carpeta.get('name')
-        id_carpeta = carpeta.get('id')
-        carpetas_en_drive[nombre] = id_carpeta
-    for clave, valor in carpetas_en_drive.items():
-        if id_ == clave:
-            query = f"parents = '{valor}' and mimeType = 'application/vnd.google-apps.folder'"
-            respuesta = SERVICE_DRIVE().files().list(q = query, fields = 'files(id, name)').execute()
-            for archivos in respuesta.get('files', []):
-                nombre_carpeta = archivos.get('name')
-                carpeta_evaluacion = archivos.get('id')
-                carpetas_profesores[nombre_carpeta] = carpeta_evaluacion
-    for clave, valor in carpetas_profesores.items():
-        for carpeta_alum in respuesta.get('files', []):
-            nombre_carpeta_alum = carpeta_alum.get('name')
-            carpeta_id_alum = carpeta_alum.get('id')
-            carpetas_alumnos[nombre_carpeta_alum] = carpeta_id_alum
-    for clave, valor in carpetas_alumnos.items():
-        if clave == nombre_alumno:
-            return carpeta_id_alum
-
-
-def alumnos(nombres: list, padrones: list) -> None:
-    with open("alumnos.csv", mode = 'r', newline = '', encoding = "UTF-8") as archivo_csv:
-        csv_reader = csv.reader(archivo_csv, delimiter = ',')
-        for linea in csv_reader:
-            nombres.append(linea[0])
-            padrones.append(linea[1])
-
-
-def leer_entrega(alumnos: list, padrones: list, mail_alumnos: list, profesores: dict, docente_alumno: dict) -> str:
-    """
-    Pre: Recibe 3 listas, con nombres de alumnos, sus padrones y sus mail's, un diccionario de profesores y otro
-    diccionario de profesores-alumnos
-    Post: Dependiendo de las condiciones de la entrega nos retorna distintos mensajes
-    """
-    asunto = ''
-    resultados = SERVICE_GMAIL().users().messages().list(userId = 'me', q = "is:unread").execute()
-    id_mails = []
-    contador = 0
-    for mail in resultados['messages']:
-        mail_ID = (resultados['messages'][contador]['id'])
-        id_mails.append(mail_ID)
-        contador += 1
-    for id_mail in id_mails:
-        mail = SERVICE_GMAIL().users().messages().get(userId = 'me', id = id_mail, format = 'metadata').execute()
-        for valor in mail['payload']['headers']:
-            if valor['name'] == 'Subject':
-                asunto = (valor['value']).split()
-            if valor['name'] == 'From':
-                de = (valor['value']).split()
-            if valor['name'] == 'To':
-                para = (valor['value']).split()
-                for i in range(len(alumnos)):
-                    if asunto[1] == padrones[i] and asunto[2] == "-" and asunto[4] == alumnos[i] and para[2] == \
-                            profesores[docente_alumno[alumnos[i]]] and de[2] in mail_alumnos:
-                        return "La entrega fue exitosa"
-                    elif asunto[1] != padrones[i] and asunto[2] == "-" or asunto[4] != alumnos[i]:
-                        return "nombre no coincide con padron"
-                    elif asunto[1] not in padrones:
-                        return "padron incorrecto"
-                    elif para[2] != profesores[docente_alumno[alumnos[i]]]:
-                        return "enviado al corrector equivocado"
-                    elif de[2] not in mail_alumnos:
-                        return "enviado con mail que no corresponde"
-                    else:
-                        return "entrega fallida"
-
-
-def lista_alumnos(alumnos: list, padrones: list, mail_alumnos: list) -> None:
-    """
-    Pre: Recibe 3 listas vacias
-    Post: Y cada una se le agrega los nombres, padrones y los mail's de cada uno
-    """
-    with open("alumnos.csv", mode = 'r', newline = '', encoding = "UTF-8") as archivo_csv:
-        csv_reader = csv.reader(archivo_csv, delimiter = ',')
-        for linea in csv_reader:
-            alumnos.append(linea[0])
-            padrones.append(linea[1])
-            mail_alumnos.append("<" + linea[2] + ">")
-
-
-def mail_docentes(profesores: dict) -> None:
-    """
-    Pre: Recibe un diccionario vacio
-    Post: Llena el diccionario con el mail que tiene cada docente
-    """
-    with open("docentes.csv", mode = 'r', newline = '', encoding = "UTF-8") as archivo_csv:
-        csv_reader = csv.reader(archivo_csv, delimiter = ',')
-        for linea in csv_reader:
-            profesores[linea[0]] = "<" + linea[1] + ">"
-
-
-def correctores(docente_alumno: dict) -> None:
-    """
-    Pre: Recibe un diccionario vacio
-    Post: Llena el diccionario para ver que corrector le toca a cada uno
-    """
-    with open("docente-alumnos.csv", mode = 'r', newline = '', encoding = "UTF-8") as archivo_csv:
-        csv_reader = csv.reader(archivo_csv, delimiter = ',')
-        for linea in csv_reader:
-            docente_alumno[linea[1]] = linea[0]
-
-
-def enviar_mensaje() -> None:
-    """
-    Post: Lee el mensaje recibido y envía un mail si la entrega fue exitosa o no, y asigna los archivos
-          enviados a cada uno
-    """
-    alumnos = []
-    padrones = []
-    mail_alumnos = []
-    profesores = {}
-    docente_alumno = {}
-    lista_alumnos(alumnos, padrones, mail_alumnos)
-    mail_docentes(profesores)
-    correctores(docente_alumno)
-    for i in range(len(alumnos)):
-        if alumnos[i] in docente_alumno:
-            gmail_de = profesores[docente_alumno[alumnos[i]]]
-        gmail_para = mail_alumnos[i]
-        mensaje = leer_entrega(alumnos, padrones, mail_alumnos, profesores, docente_alumno)
-        if mensaje == "La entrega fue exitosa":
-            importar_archivos()
-
-    message = MIMEText(mensaje)
-    message['to'] = gmail_para
-    message['from'] = gmail_de
-    message['subject'] = "Entrega"
-    raw = base64.urlsafe_b64encode(message.as_bytes())
-    raw = raw.decode()
-    body = {'raw': raw}
-    try:
-        message = (SERVICE_GMAIL().users().messages().send(userId = 'me', body = body).execute())
-        print("Mensaje enviado")
-    except errors.MessageError as error:
-        print('An error occurred: %s' % error)
 
 
 def opcion_valida(opcion: str) -> int:
