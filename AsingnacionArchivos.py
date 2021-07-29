@@ -14,17 +14,16 @@ def importar_archivos() -> None:
         id_mails.append(mail_ID)
         contador += 1
     for id_mail in id_mails:
-        mail = SERVICE_GMAIL().users().messages().get(userId='me', id=id_mail, format='metadata').execute()
+        mail = SERVICE_GMAIL().users().messages().get(userId='me', id=id_mail, format='full').execute()
+        for valor in mail['payload']['body']:
+            id_archivo = valor['attachmentId']
         for valor in mail['payload']['headers']:
             if valor['name'] == 'Subject':
                 asunto = (valor['value']).split()
-                for i in range (len(nombres)):
+                for i in range (len(padrones)):
                     if asunto[1] == padrones[i]:
-                        archivo = SERVICE_GMAIL().users().attachments().get(userId='me', messageId=mail_ID, x__xgafv=None).execute()
                         carpeta_id= buscar_carpeta(nombres[i])
-                        SERVICE_DRIVE.files().update(fileId = archivo.get("id"),
-                                        addParents = carpeta_id,
-                                         ).execute()
+                        SERVICE_DRIVE.files().update(fileId = id_archivo, addParents = carpeta_id,).execute()
             
 
 def buscar_carpeta(nombre_alumno: str) ->  str:
